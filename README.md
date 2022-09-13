@@ -20,3 +20,9 @@ caex2 https://github.com/carpentries-incubator/deep-learning-intro
 ```
 This creates a new file called `exercises-document.md` with all exercises in the lesson,
 grouped and ordered by episode.
+
+## Current support
+This package currently supports carpentries lessons in the 'old' style, it has been tested on:
+* https://github.com/carpentries-incubator/deep-learning-intro
+* https://github.com/datacarpentry/r-socialsci (episodes are in Rmarkdown)
+* https://github.com/datacarpentry/python-socialsci

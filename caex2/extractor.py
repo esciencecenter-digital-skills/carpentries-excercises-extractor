@@ -59,6 +59,15 @@ def extract_challenges(episode_filepath, output_file):
             fout.write('\n\n')
 
 
+def get_episode_paths(repo_dir: Path):
+    episode_dir = repo_dir / '_episodes'
+    episode_paths = sorted([path for path in episode_dir.iterdir() if path.name not in ['.gitkeep']])
+
+    if len(episode_paths) == 0:
+        episode_dir = repo_dir / '_episodes_rmd'
+        episode_paths = sorted([path for path in episode_dir.iterdir() if path.name not in ['.gitkeep']])
+    return episode_paths
+
 @click.command()
 @click.argument('lesson_url')
 @click.option('--output', default='exercises-document.md', help='Name of output file to write to')
@@ -73,8 +82,7 @@ def main(lesson_url, output):
         logging.info(f'Cloning {lesson_url} in temporary directory')
         repo_dir = temp_dir / 'repo'
         Repo.clone_from(lesson_url, repo_dir)
-        episode_dir = repo_dir / '_episodes'
-        episode_paths = sorted([path for path in episode_dir.iterdir() if path.name not in ['.gitkeep']])
+        episode_paths = get_episode_paths(repo_dir)
         logging.info(f'Found {len(episode_paths)} episodes')
         for episode_path in episode_paths:
             extract_challenges(episode_path, output)
