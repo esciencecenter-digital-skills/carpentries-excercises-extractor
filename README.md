@@ -1,2 +1,3 @@
-# carpentries-excercises-extractor
-Automatically extracts all exercises from a carpentries lesson
+# CaEx2 (CArpentries EXercises EXtractor)
+## What does it do?
+No more copy-pasting, automatically extract all exercises from a carpentries lesson.
