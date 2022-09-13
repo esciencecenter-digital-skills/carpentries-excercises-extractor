@@ -26,3 +26,6 @@ This package currently supports carpentries lessons in the 'old' style, it has b
 * https://github.com/carpentries-incubator/deep-learning-intro
 * https://github.com/datacarpentry/r-socialsci (episodes are in Rmarkdown)
 * https://github.com/datacarpentry/python-socialsci
+
+## Acknowledgements
+This package is based on [this gist](https://gist.github.com/dafnevk/6b235e09d5d72f3a71eb662a72fd3ef2) by Dafne van Kuppevelt (@dafnevk).
