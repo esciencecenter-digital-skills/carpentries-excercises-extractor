@@ -2,6 +2,7 @@
 # coding: utf-8
 import logging
 import tempfile
+import os
 from pathlib import Path
 
 import click
@@ -23,6 +24,22 @@ def get_indented_blocks(episode_lines):
             block = []
     return indented_blocks
 
+def get_challenge_blocks(episode_lines):
+    challenge_blocks = []
+    block = []
+    for line in episode_lines:
+        if line.startswith(':'):
+            if line.__contains__('challenge'):
+                block.append(line.strip())
+            elif line.__contains__('solution'):
+                challenge_blocks.append(block)
+                block = []
+        else:
+            if len(block) > 0:
+                block.append(line.strip())
+    stripped_challenges = ['\n'.join(strip_challenge(c)) for c in challenge_blocks]
+    return stripped_challenges
+
 
 def strip_challenge(block):
     stripped_block = []
@@ -40,16 +57,19 @@ def extract_challenges_from_blocks(indented_blocks):
     return stripped_challenges
 
 
-def extract_episode(episode_lines):
-    indented_blocks = get_indented_blocks(episode_lines)
-    challenges = extract_challenges_from_blocks(indented_blocks)
+def extract_episode(episode_lines, style):
+    if style == 'old':
+        indented_blocks = get_indented_blocks(episode_lines)
+        challenges = extract_challenges_from_blocks(indented_blocks)
+    elif style == 'new':
+        challenges = get_challenge_blocks(episode_lines)
     return challenges
 
 
-def extract_challenges(episode_filepath, output_file):
+def extract_challenges(episode_filepath, output_file, style):
     with open(episode_filepath) as fin:
         episode_lines = fin.readlines()
-    challenges = extract_episode(episode_lines)
+    challenges = extract_episode(episode_lines, style)
 
     # Write to output file
     with open(output_file, 'a') as fout:
@@ -60,13 +80,21 @@ def extract_challenges(episode_filepath, output_file):
 
 
 def get_episode_paths(repo_dir: Path):
-    episode_dir = repo_dir / '_episodes'
-    episode_paths = sorted([path for path in episode_dir.iterdir() if path.name not in ['.gitkeep']])
+    
+    episode_dir_opt = ['_episodes', '_episodes_rmd', 'episodes']
+    styles = ['old', 'old', 'new']
+    episode_dir = repo_dir / episode_dir_opt[0]
+    style = styles[0]
+    i = 1
+    while os.path.isdir(episode_dir) == False:
+        episode_dir = repo_dir / episode_dir_opt[i]
+        style = styles[i]
+        if i == len(episode_dir_opt):
+            raise Exception(f"Episodes folder not found in: ", episode_dir_opt)
+        i = i + 1
 
-    if len(episode_paths) == 0:
-        episode_dir = repo_dir / '_episodes_rmd'
-        episode_paths = sorted([path for path in episode_dir.iterdir() if path.name not in ['.gitkeep']])
-    return episode_paths
+    episode_paths = sorted([path for path in episode_dir.iterdir() if path.name not in ['.gitkeep']])
+    return episode_paths, style
 
 @click.command()
 @click.argument('lesson_url')
@@ -82,11 +110,12 @@ def main(lesson_url, output):
         logging.info(f'Cloning {lesson_url} in temporary directory')
         repo_dir = temp_dir / 'repo'
         Repo.clone_from(lesson_url, repo_dir)
-        episode_paths = get_episode_paths(repo_dir)
-        logging.info(f'Found {len(episode_paths)} episodes')
+        episode_paths, style = get_episode_paths(repo_dir)
+        logging.info(f'Found {len(episode_paths)} possible episodes')
         for episode_path in episode_paths:
-            extract_challenges(episode_path, output)
-            logging.info(f'Extracted exercises from {episode_path.name}')
+            if os.path.isfile(episode_path):
+                extract_challenges(episode_path, output, style)
+                logging.info(f'Extracted exercises from {episode_path.name}')
 
 
 if __name__ == '__main__':
