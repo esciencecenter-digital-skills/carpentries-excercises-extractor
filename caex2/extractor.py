@@ -32,20 +32,29 @@ def get_challenge_blocks(episode_lines):
             if line.__contains__('challenge'):
                 block.append(line.strip())
             elif line.__contains__('solution'):
+                block.append(line.strip())
                 challenge_blocks.append(block)
                 block = []
         else:
             if len(block) > 0:
                 block.append(line.strip())
-    stripped_challenges = ['\n'.join(strip_challenge(c)) for c in challenge_blocks]
+    stripped_challenges = ['\n'.join(strip_challenge_new(c)) for c in challenge_blocks]
     return stripped_challenges
 
 
-def strip_challenge(block):
+def strip_challenge_new(block):
     stripped_block = []
     for line in block:
-        if not line.startswith('> >'):
-            line_stripped = line[1:].strip()
+        if not line.startswith(':'):
+            line_stripped = line[0:].strip()
+            stripped_block.append(line_stripped)
+    return stripped_block
+
+def strip_challenge_old(block):
+    stripped_block = []
+    for line in block:
+        if not line.startswith(':'):
+            line_stripped = line[0:].strip()
             if not line_stripped.startswith('{:'):
                 stripped_block.append(line_stripped)
     return stripped_block
@@ -53,7 +62,7 @@ def strip_challenge(block):
 
 def extract_challenges_from_blocks(indented_blocks):
     challenges = [block[:-1] for block in indented_blocks if 'challenge' in block[-1]]
-    stripped_challenges = ['\n'.join(strip_challenge(c)) for c in challenges]
+    stripped_challenges = ['\n'.join(strip_challenge_old(c)) for c in challenges]
     return stripped_challenges
 
 
