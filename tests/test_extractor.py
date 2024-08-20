@@ -7,5 +7,5 @@ def test_extractor():
     with open(TEST_EPISODE_FILEPATH) as fin:
         episode_lines = fin.readlines()
     challenges = extract_episode(episode_lines)
-    assert len(challenges) == 6
-    assert challenges[0].startswith('## Penguin Dataset')
+    assert len(challenges) == 5
+    assert challenges[0].startswith('\n## Pairplot')

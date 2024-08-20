@@ -66,11 +66,11 @@ def extract_challenges_from_blocks(indented_blocks):
     return stripped_challenges
 
 
-def extract_episode(episode_lines, style):
+def extract_episode(episode_lines, style='new'):
     if style == 'old':
         indented_blocks = get_indented_blocks(episode_lines)
         challenges = extract_challenges_from_blocks(indented_blocks)
-    elif style == 'new':
+    else:
         challenges = get_challenge_blocks(episode_lines)
     return challenges
 
